@@ -317,7 +317,7 @@ public class BBMetalCamera: NSObject {
     public init?(
         captureSession: AVCaptureSession = .init(),
         sessionPreset: AVCaptureSession.Preset = .high,
-        deviceType: AVCaptureDevice.DeviceType = .builtInWideAngleCamera,
+        deviceType: AVCaptureDevice.DeviceType = .builtInTripleCamera,
         position: AVCaptureDevice.Position = .back,
         multipleSessions: Bool = false
     ) {
