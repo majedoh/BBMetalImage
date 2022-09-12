@@ -375,6 +375,17 @@ public class BBMetalCamera: NSObject {
         originalOrientation = connection.videoOrientation
         connection.videoOrientation = .portrait
         
+        
+        for i in videoOutput.connections {
+            for x in i.inputPorts {
+                if x.mediaType == .video {
+                    if i.isVideoMirroringSupported {
+                        i.automaticallyAdjustsVideoMirroring = false
+                    }
+                }
+            }
+        }
+        
         session.commitConfiguration()
         
         #if !targetEnvironment(simulator)
@@ -600,6 +611,24 @@ public class BBMetalCamera: NSObject {
         lock.signal()
     }
     
+    public func mirrorCamera(){
+        for i in videoOutput.connections {
+            for x in i.inputPorts {
+                if x.mediaType == .video {
+                    if i.isVideoMirroringSupported {
+                        i.automaticallyAdjustsVideoMirroring = false
+                        if camera.position == .back {
+                            i.isVideoMirrored = false
+                        }else{
+                            i.isVideoMirrored = true
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    
     /// Switches camera position (back to front, or front to back)
     ///
     /// - Returns: true if succeed, or false if fail
@@ -647,6 +676,8 @@ public class BBMetalCamera: NSObject {
             connection.isVideoOrientationSupported else { return false }
         originalOrientation = connection.videoOrientation
         connection.videoOrientation = .portrait
+        
+        mirrorCamera()
         
         if _canGetDepthData,
            #available(iOS 11.0, *) {
@@ -902,7 +933,7 @@ extension BBMetalCamera: AVCaptureVideoDataOutputSampleBufferDelegate, AVCapture
     }
 }
 
-extension BBMetalCamera: AVCapturePhotoCaptureDelegate {    
+extension BBMetalCamera: AVCapturePhotoCaptureDelegate {
     public func photoOutput(_ output: AVCapturePhotoOutput,
                             didFinishProcessingPhoto photoSampleBuffer: CMSampleBuffer?,
                             previewPhoto previewPhotoSampleBuffer: CMSampleBuffer?,
